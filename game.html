@@ -1,25 +1,46 @@
-{% extends "header.html" %}
-{% block content %}
-{% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'css_game/doge.css' %}" />
-<body style="background-image: linear-gradient( 90deg,  rgba(0,0,0,0.93) 11.2%, rgba(63,61,61,1) 78.9% );">
-    <div class="container text-center text-white">
-      <div class="row">
-        <div class="col-md">
-          {% load staticfiles %}
-          <img class="img-fluid" src="{% static 'images/doge_dodge.png' %}" alt="Doge Dodge">
-          <br><br>
-          <img class="img-fluid" src="{% static 'images/help.png' %}" alt="Doge Dodge">
-          <br><br>
-          <p>I built this game in Golang and compiled it to Javascript with <a href="https://github.com/gopherjs/gopherjs">GopherJS</a> to run it in the browser. It is heavily inspired by the Chrome T-Rex game that pops up when there's bad connectivity (s/o to Cal's wifi!), as well as my favorite game of all time, Crossy Road.</p>
-          <p>Credits: <a href="https://ebiten.org/">tile art and sound effects</a>, <a href="http://pixelartmaker.com/art/13d23ac43116c0c.png">doge art</a>, <a href="http://pixelartmaker.com/art/dc64eddc1719fb3.png">cactus art</a>, <a href="https://steamuserimages-a.akamaihd.net/ugc/96104387823325173/12EBB3BF7F176EFFCE809BFA500953E1F60F8825/">background art</a>, <a href="http://pixelartmaker.com/art/da268f06e621b21.png">rock art</a>, <a href="http://pixelartmaker.com/art/dca2574a41f6294.png">spike art</a>.
-        </div>
-        {% load staticfiles %}
-        <script src="{% static 'js/doge.js' %}"></script>
+<!DOCTYPE HTML>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-      </div>
-      </div>
-    </div>
-  </body>
+  <title>Priya Sundaresan</title>
+  
+  <meta name="author" content="Priya Sundaresan">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+     
+  <!--
+  <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/pricing/">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  -->
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="css_game/doge.css"/>
+</head>
 
-{% endblock %}
+<body>
+  <table style="width:100%;max-width:800px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+    <tr style="padding:0px">
+      <td style="padding:0px">
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+          <tr style="padding:0px">
+            <td style="padding:2.5%;width:63%;vertical-align:middle">
+              <p style="text-align:center">
+                <name>Doge Dodge</name>
+              </p>
+            </td>
+            <td style="padding:2.5%;width:40%;max-width:40%">
+            </td>
+          </tr>
+        </tbody></table>
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+
+      </td>
+    </tr>
+  </table>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="js/doge.js"></script>
+
+
+</html>
