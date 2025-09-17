@@ -483,15 +483,15 @@
                 ];
           
                 const map = L.map('concert-map', { zoomControl: false, attributionControl: false }).setView([37.7749, -122.4194], 4);
-          
+                
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                   subdomains: 'abcd',
                   maxZoom: 19
                 }).addTo(map);
-          
+                
                 const latlngs = concerts.map(c => c.coords);
                 const polyline = L.polyline(latlngs, { color: '#3b8b5a', weight: 3 }).addTo(map);
-          
+                
                 const marker = L.circleMarker(concerts[0].coords, { 
                   radius: 6, 
                   fillColor: '#3b8b5a', 
@@ -499,28 +499,38 @@
                   weight: 1, 
                   fillOpacity: 0.9 
                 }).addTo(map);
-          
-                let index = concerts.length-1;
+                
+                let popup = L.popup({ closeButton: false, autoClose: false, closeOnClick: false });
+                let index = concerts.length - 1; // start at newest concert
+                
                 function showNextConcert() {
                   const c = concerts[index];
-                  marker.setLatLng(c.coords).bindPopup(`<b>${c.artist}</b><br>${c.venue}`).openPopup();
+                
+                  // Move marker
+                  marker.setLatLng(c.coords);
                   map.setView(c.coords, 10, { animate: true });
-          
-                  const progressPercent = ((index + 1) / concerts.length) * 100;
+                
+                  // Fade-in popup
+                  popup.setLatLng(c.coords)
+                       .setContent(`<b>${c.artist}</b><br>${c.venue}`)
+                       .openOn(map);
+                
+                  // Update progress bar
+                  const progressPercent = ((index) / concerts.length) * 100;
                   document.getElementById('progress').style.width = progressPercent + '%';
-          
-                  index = (index - 1) % concerts.length;
+                
+                  // Move to previous concert, loop back to last at the start
+                  index = (index - 1 + concerts.length) % concerts.length;
                 }
-          
+                
+                // start loop every 1.2s
                 showNextConcert();
                 setInterval(showNextConcert, 1200);
               </script>
             </td>
             <td width="75%" valign="middle">
-              <a href="game.html">
-                <papertitle>Concerts I've Been To!</papertitle>
-              </a>
-              <br>I've spent an embarrassingly long amount of time in Ticketmaster queues in this life 🙃
+              <br>
+              <papertitle>Concerts I've Been To!</papertitle>
             </td>
           </tr>
 
