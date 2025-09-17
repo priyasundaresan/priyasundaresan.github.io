@@ -425,6 +425,106 @@
               <br>
             </td>
           </tr>
+
+          <tr>
+            <td style="padding:20px;width:25%;vertical-align:middle">
+              <!-- Progress bar -->
+              <div style="width:100%;height:8px;background:#e0e0e0;border-radius:4px;margin-bottom:5px;position:relative;">
+                <div id="progress" style="height:100%;width:0%;background:#3b8b5a;border-radius:4px;"></div>
+                <span style="position:absolute;left:0;font-size:0.75rem;color:#555;">2013</span>
+                <span style="position:absolute;right:0;font-size:0.75rem;color:#555;">2025</span>
+              </div>
+              <br><br>
+          
+              <div id="concert-map" style="width:100%;height:200px;border-radius:12px;overflow:hidden;"></div>
+          
+              <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+              <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+          
+              <script>
+                const concerts = [
+                  { artist: "Kelly Clarkson & Panic! At The Disco", venue: "Shoreline Amphitheatre", coords: [37.4241, -122.0806] },
+                  { artist: "Flo Rida, 5SOS & Tori Kelly", venue: "California's Great America", coords: [37.4003, -121.9706] },
+                  { artist: "G-Eazy", venue: "Fox Theater Oakland", coords: [37.8044, -122.2711] },
+                  { artist: "Ed Sheeran", venue: "AT&T Park", coords: [37.7786, -122.3893] },
+                  { artist: "Ravyn Lenae & Jorja Smith", venue: "Fox Theater Oakland", coords: [37.8044, -122.2711] },
+                  { artist: "Grateful Dead", venue: "Shoreline Amphitheatre", coords: [37.4241, -122.0806] },
+                  { artist: "LANY", venue: "Bill Graham Civic Auditorium", coords: [37.7830, -122.4039] },
+                  { artist: "Thundercat & Anderson .Paak", venue: "Bill Graham Civic Auditorium", coords: [37.7830, -122.4039] },
+                  { artist: "Dead & Company", venue: "Chase Center", coords: [37.7680, -122.3877] },
+                  { artist: "Chelsea Cutler & Quinn", venue: "Greek Theatre Berkeley", coords: [37.8721, -122.2601] },
+                  { artist: "Jeremy Zucker", venue: "Fox Theater Oakland", coords: [37.8044, -122.2711] },
+                  { artist: "Valley", venue: "Rickshaw Stop", coords: [37.7760, -122.4193] },
+                  { artist: "Omar Apollo", venue: "Masonic Auditorium", coords: [37.7830, -122.4335] },
+                  { artist: "Conan Gray", venue: "Fox Theater Oakland", coords: [37.8044, -122.2711] },
+                  { artist: "Raveena", venue: "Fox Theater Oakland", coords: [37.8044, -122.2711] },
+                  { artist: "Sasha Sloan", venue: "The Fillmore SF", coords: [37.7840, -122.4334] },
+                  { artist: "Lizzie McAlpine", venue: "Rickshaw Stop", coords: [37.7760, -122.4193] },
+                  { artist: "LANY", venue: "Greek Theatre Berkeley", coords: [37.8721, -122.2601] },
+                  { artist: "Omar Apollo", venue: "Masonic Auditorium", coords: [37.7830, -122.4335] },
+                  { artist: "Steve Lacy, Foushee & Toro y Moi", venue: "Frost Amphitheatre", coords: [37.4292, -122.1700] },
+                  { artist: "Del Water Gap & Maggie Rogers", venue: "Bill Graham Civic Auditorium", coords: [37.7830, -122.4039] },
+                  { artist: "Boygenius", venue: "Frost Amphitheatre", coords: [37.4292, -122.1700] },
+                  { artist: "The 1975", venue: "SAP Center San Jose", coords: [37.3320, -121.9010] },
+                  { artist: "Dominic Fike", venue: "Frost Amphitheatre", coords: [37.4292, -122.1700] },
+                  { artist: "Chelsea Cutler", venue: "Masonic Auditorium", coords: [37.7830, -122.4335] },
+                  { artist: "Taylor Swift & Phoebe Bridgers", venue: "Lincoln Financial Field", coords: [39.9000, -75.1670] },
+                  { artist: "Drake", venue: "Scotiabank Arena Toronto", coords: [43.6415, -79.3794] },
+                  { artist: "LANY", venue: "Paramount Theatre Seattle", coords: [47.6097, -122.3331] },
+                  { artist: "Noah Kahan", venue: "Greek Theatre Berkeley", coords: [37.8721, -122.2601] },
+                  { artist: "Khruangbin", venue: "Greek Theatre Berkeley", coords: [37.8721, -122.2601] },
+                  { artist: "Tems", venue: "Bill Graham Civic Auditorium", coords: [37.7830, -122.4039] },
+                  { artist: "Dayglow", venue: "Fox Theater Oakland", coords: [37.8044, -122.2711] },
+                  { artist: "Clairo", venue: "Frost Amphitheatre", coords: [37.4292, -122.1700] },
+                  { artist: "Aminé & Toro y Moi", venue: "Greek Theatre Berkeley", coords: [37.8721, -122.2601] },
+                  { artist: "Hope Tala & Zayn", venue: "Bill Graham Civic Auditorium", coords: [37.7830, -122.4039] },
+                  { artist: "Role Model", venue: "Fox Theater Oakland", coords: [37.8044, -122.2711] },
+                  { artist: "Olivia Dean", venue: "Fox Theater Oakland", coords: [37.8044, -122.2711] }
+                ];
+          
+                const map = L.map('concert-map', { zoomControl: false, attributionControl: false }).setView([37.7749, -122.4194], 4);
+          
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                  subdomains: 'abcd',
+                  maxZoom: 19
+                }).addTo(map);
+          
+                const latlngs = concerts.map(c => c.coords);
+                const polyline = L.polyline(latlngs, { color: '#3b8b5a', weight: 3 }).addTo(map);
+          
+                const marker = L.circleMarker(concerts[0].coords, { 
+                  radius: 6, 
+                  fillColor: '#3b8b5a', 
+                  color: '#2c6b45', 
+                  weight: 1, 
+                  fillOpacity: 0.9 
+                }).addTo(map);
+          
+                let index = concerts.length-1;
+                function showNextConcert() {
+                  const c = concerts[index];
+                  marker.setLatLng(c.coords).bindPopup(`<b>${c.artist}</b><br>${c.venue}`).openPopup();
+                  map.setView(c.coords, 10, { animate: true });
+          
+                  const progressPercent = ((index + 1) / concerts.length) * 100;
+                  document.getElementById('progress').style.width = progressPercent + '%';
+          
+                  index = (index - 1) % concerts.length;
+                }
+          
+                showNextConcert();
+                setInterval(showNextConcert, 1200);
+              </script>
+            </td>
+            <td width="75%" valign="middle">
+              <a href="game.html">
+                <papertitle>Concerts I've Been To!</papertitle>
+              </a>
+              <br>I've spent an embarrassingly long amount of time in Ticketmaster queues in this life 🙃
+            </td>
+          </tr>
+
+
         </tbody></table>
 
         </tbody></table>
