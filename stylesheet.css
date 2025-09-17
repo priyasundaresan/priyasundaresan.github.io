@@ -66,7 +66,7 @@
 }
 
 a {
-  color: #008bd1;
+  color: #288533;
   text-decoration: none;
 }
 
@@ -132,3 +132,45 @@ span.highlight {
   background-color: #ffffd0;
 }
 
+.highlight {
+  background-color: #f4ffeb; /* soft green tint */
+  border-left: 6px solid #30a650; /* accent line */
+  border-radius: 20px;
+}
+
+.conference-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  background-color: #b5c67a; /* default green */
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Variants for different conferences */
+.badge-corl {
+  background-color: #b5c67a; /* sage green */
+}
+
+.badge-iclr {
+  background-color: #fbe77d; /* brighter pastel golden yellow */
+}
+
+/* IEEE conferences - unified light terracotta */
+.badge-icra,
+.badge-ral,
+.badge-iros,
+.badge-case {
+  background-color: #f8d1a6; /* light terracotta/apricot */
+}
+
+.badge-rss {
+  background-color: #f6b7bc; /* soft pastel rose */
+}
+
+.badge-preprint {
+  background-color: #e3e3e3; /* light warm gray */
+}
