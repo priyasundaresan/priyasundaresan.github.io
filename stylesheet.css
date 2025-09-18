@@ -152,7 +152,7 @@ span.highlight {
 
 /* Variants for different conferences */
 .badge-corl {
-  background-color: #b5c67a; /* sage green */
+  background-color: #cbdfbd; /* sage green */
 }
 
 .badge-iclr {
@@ -160,15 +160,24 @@ span.highlight {
 }
 
 /* IEEE conferences - unified light terracotta */
-.badge-icra,
-.badge-ral,
-.badge-iros,
+.badge-icra {
+  background-color: #ffd6ba; 
+}
+
+.badge-ral {
+  background-color: #ffdac6; 
+}
+
+.badge-iros {
+  background-color: #f4f0bb; 
+}
+
 .badge-case {
-  background-color: #f8d1a6; /* light terracotta/apricot */
+  background-color: #e2ece9; /* light terracotta/apricot */
 }
 
 .badge-rss {
-  background-color: #f6b7bc; /* soft pastel rose */
+  background-color: #eac4d5; /* soft pastel rose */
 }
 
 .badge-preprint {
