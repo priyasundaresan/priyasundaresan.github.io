@@ -62,7 +62,9 @@
     });
 
     function spawnItem() {
-      const good = Math.random() < 0.7;
+      // Papers get more common as HP rises
+      let paperChance = Math.min(0.3 + grad.hp * 0.005, 0.7); 
+      const good = Math.random() > paperChance;
       items.push({
         x: Math.random() * (canvas.width - 30),
         y: -20,
@@ -136,20 +138,18 @@
       if (gameOver || gameWon) {
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.font = "30px 'Libre Franklin', sans-serif";
-        ctx.fillStyle = "black";
-        if (gameWon) {
-          ctx.fillStyle = "green";
-          ctx.fillText("You Win! 🎓🍕☕", 100, 250);
-        } else {
-          ctx.fillText("Game Over 😵", 110, 250);
-        }
+        ctx.fillStyle = gameWon ? "green" : "black";
+        ctx.fillText(gameWon ? "You Win! 🎓🍕☕" : "Game Over 😵", 100, 250);
         return;
       }
 
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
-      let speed = Math.min(2 + grad.hp * 0.05, 8.5);
-      let spawnRate = Math.max(45 - grad.hp, 12);
+      // Speed ramps up more sharply, up to 14
+      let speed = Math.min(2 + grad.hp * 0.08, 10);  
+
+      // Items spawn much faster with higher HP
+      let spawnRate = Math.max(40 - grad.hp * 0.6, 5);
 
       drawGrad();
       drawItems();
@@ -165,7 +165,7 @@
       if (grad.hp >= 100) gameWon = true;
 
       frame++;
-      if (frame % spawnRate === 0) spawnItem();
+      if (frame % Math.floor(spawnRate) === 0) spawnItem();
 
       requestAnimationFrame(loop);
     }
