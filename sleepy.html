@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sleepy Grad Student Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { 
+      margin:0; 
+      background:#fff; 
+      text-align:center; 
+      font-family:'Libre Franklin', sans-serif; 
+    }
+    canvas { 
+      background:#fff; 
+      display:block; 
+      margin:20px auto; 
+      border:3px solid #444; 
+      border-radius:10px; 
+    }
+    #instructions { font-size:16px; margin-top:10px; }
+    #score { font-size:20px; margin-top:5px; }
+    #lives { font-size:20px; margin-top:5px; color:red; }
+  </style>
+</head>
+<body>
+  <h2>Sleepy Grad Student</h2>
+  <div id="instructions">
+    Move with your mouse. Press <b>spacebar</b> to hop.<br>
+    Collect 🍕☕ to gain HP. Avoid 📄 papers!<br>
+    Reach <b>100 HP</b> to win!
+  </div>
+  <canvas id="gameCanvas" width="400" height="500"></canvas>
+  <div id="score">HP: 5</div>
+  <div id="lives">❤️❤️❤️</div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let grad = { x: 200, y: 450, size: 40, hp: 5, face: "😴", faceTimer: 0 };
+    let items = [];
+    let floatTexts = [];
+    let frame = 0;
+    let gameOver = false;
+    let gameWon = false;
+    let lives = 3;
+    let stunned = 0;
+
+    // Mouse movement
+    canvas.addEventListener("mousemove", e => {
+      const rect = canvas.getBoundingClientRect();
+      grad.x = e.clientX - rect.left;
+    });
+
+    // Spacebar hop
+    document.addEventListener("keydown", e => {
+      if (e.code === "Space") grad.y = 420;
+    });
+    document.addEventListener("keyup", e => {
+      if (e.code === "Space") grad.y = 450;
+    });
+
+    function spawnItem() {
+      const good = Math.random() < 0.7;
+      items.push({
+        x: Math.random() * (canvas.width - 30),
+        y: -20,
+        size: 30,
+        good: good,
+        emoji: good ? (Math.random() < 0.5 ? "🍕" : "☕") : "📄"
+      });
+    }
+
+    function drawText(text, x, y, size, color="black") {
+      ctx.font = `${size}px 'Libre Franklin', sans-serif`;
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y);
+    }
+
+    function drawGrad() {
+      drawText(grad.face, grad.x - grad.size/2, grad.y + grad.size/2, 40);
+      if (grad.faceTimer > 0) grad.faceTimer--;
+      else if (grad.face !== "😵‍💫") grad.face = "😴";
+    }
+
+    function drawItems() {
+      items.forEach(it => {
+        drawText(it.emoji, it.x, it.y, it.size);
+      });
+    }
+
+    function updateItems(speed) {
+      items.forEach(it => { it.y += speed; });
+      items = items.filter(it => it.y < canvas.height + 30);
+    }
+
+    function checkCollisions() {
+      items.forEach((it, i) => {
+        if (Math.abs(it.x - grad.x) < 30 && Math.abs(it.y - grad.y) < 30) {
+          if (it.good) {
+            grad.hp++;
+            grad.face = "😳";
+            grad.faceTimer = 20;
+            floatTexts.push({ text: "+1", x: grad.x, y: grad.y, color: "green", life: 30 });
+          } else {
+            grad.hp--;
+            lives--;
+            grad.face = "😵‍💫";
+            stunned = 60; // pause ~1 second
+            floatTexts.push({ text: "-1", x: grad.x, y: grad.y, color: "red", life: 30 });
+            updateLivesDisplay();
+            if (lives <= 0) {
+              gameOver = true;
+            }
+          }
+          items.splice(i, 1);
+        }
+      });
+    }
+
+    function drawFloatTexts() {
+      floatTexts.forEach(ft => {
+        drawText(ft.text, ft.x, ft.y, 20, ft.color);
+        ft.y -= 1;
+        ft.life--;
+      });
+      floatTexts = floatTexts.filter(ft => ft.life > 0);
+    }
+
+    function updateLivesDisplay() {
+      document.getElementById("lives").textContent = "❤️".repeat(lives);
+    }
+
+    function loop() {
+      if (gameOver || gameWon) {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.font = "30px 'Libre Franklin', sans-serif";
+        ctx.fillStyle = "black";
+        if (gameWon) {
+          ctx.fillStyle = "green";
+          ctx.fillText("You Win! 🎓🍕☕", 100, 250);
+        } else {
+          ctx.fillText("Game Over 😵", 110, 250);
+        }
+        return;
+      }
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      let speed = Math.min(2 + grad.hp * 0.05, 7);
+      let spawnRate = Math.max(45 - grad.hp, 12);
+
+      drawGrad();
+      drawItems();
+      if (stunned > 0) {
+        stunned--;
+      } else {
+        updateItems(speed);
+        checkCollisions();
+      }
+      drawFloatTexts();
+
+      document.getElementById("score").textContent = "HP: " + grad.hp;
+      if (grad.hp >= 100) gameWon = true;
+
+      frame++;
+      if (frame % spawnRate === 0) spawnItem();
+
+      requestAnimationFrame(loop);
+    }
+
+    updateLivesDisplay();
+    loop();
+  </script>
+</body>
+</html>
+
