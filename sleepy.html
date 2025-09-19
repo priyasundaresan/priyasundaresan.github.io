@@ -232,8 +232,8 @@
           drawGrad(); drawFloatTexts(); frame++; requestAnimationFrame(loop); return;
         }
 
-        let speed = Math.min(3 + grad.hp * 0.5 + frame/600, 18); 
-        let spawnRate = Math.max(30 - grad.hp * 0.5 - frame/200, 8);
+        let speed = Math.min(2 + grad.hp * 0.1 + frame/600, 5); 
+        let spawnRate = Math.max(40 - grad.hp * 0.2 - frame/200, 4);
 
         drawGrad(); drawItems();
         if (stunned > 0) stunned--; else { updateItems(speed); checkCollisions(); }

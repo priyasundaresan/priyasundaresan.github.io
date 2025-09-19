@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TidyBot Banana Dodge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #ffffff; 
+      overflow: hidden;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    canvas { position: absolute; top:0; left:0; z-index:0; }
+    #robot {
+      position: absolute;
+      width: 250px;
+      transform: translate(-50%, -50%) rotate(0deg);
+      pointer-events: none;
+      z-index: 1;
+      transition: transform 0.2s;
+    }
+    #score {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 28px;
+      color: #16a34a;
+      text-shadow: 2px 2px #000000;
+      z-index: 2;
+    }
+    #gameOver {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      text-align: center;
+      z-index: 3;
+    }
+    #gameOver img {
+      width: 300px;
+      display: block;
+      margin-bottom: 10px;
+    }
+    #finalScore {
+      font-size: 20px;
+      color: #4ade80;
+      text-shadow: 2px 2px #000000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="trail"></canvas>
+  <div id="score">Score: 0</div>
+  <div id="gameOver">
+    <img src="images/gameover.png" alt="Game Over">
+    <div id="finalScore"></div>
+  </div>
+  <img id="robot" src="images/tidybot.png" alt="TidyBot">
+
+  <script>
+    const robot = document.getElementById("robot");
+    const canvas = document.getElementById("trail");
+    const ctx = canvas.getContext("2d");
+    const scoreDiv = document.getElementById("score");
+    const gameOverDiv = document.getElementById("gameOver");
+    const finalScoreDiv = document.getElementById("finalScore");
+
+    let gameOver = false;
+    const robotWidth = 250;
+    const robotHeight = 250;
+    let robotX = window.innerWidth / 2;
+    let robotY;
+    let targetX = robotX;
+    let robotRotation = 0;
+
+    let robotVX = 0;
+    let isSlipping = false;
+    const friction = 0.9;
+    let score = 0;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const baseY = canvas.height * 0.75;
+      robotY = baseY - robotHeight / 2;
+      robot.style.top = robotY + "px";
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Mouse control
+    document.addEventListener("mousemove", (e) => {
+      if (!gameOver && !isSlipping) targetX = e.clientX;
+    });
+
+    const bananas = [];
+
+    setInterval(() => {
+      if (!gameOver) {
+        const landingY = canvas.height * 0.75 + Math.random() * canvas.height * 0.05;
+        const banana = {
+          x: Math.random() * window.innerWidth,
+          y: -60,
+          width: 120,
+          height: 120,
+          vy: 0,
+          landed: false,
+          landY: landingY,
+          removeAfter: null,
+          image: new Image()
+        };
+        banana.image.src = "images/banana.png";
+        bananas.push(banana);
+      }
+    }, 700);
+
+    function animate() {
+      if (gameOver) return;
+
+      // Robot movement
+      if (!isSlipping) {
+        robotX += (targetX - robotX) * 0.15;
+      } else {
+        robotX += robotVX;
+        robotVX *= friction;
+        if (Math.abs(robotVX) < 0.5) isSlipping = false;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      robot.style.left = robotX + "px";
+      robot.style.transform = `translate(-50%, -50%) rotate(${robotRotation}deg) scaleX(${targetX > robotX ? 1 : -1})`;
+
+      const now = Date.now();
+      for (let i = bananas.length-1; i>=0; i--) {
+        const b = bananas[i];
+
+        if (!b.landed) {
+          b.vy += 0.2; // slower gravity
+          b.y += b.vy;
+
+          if (b.y + b.height/2 >= b.landY) {
+            b.y = b.landY - b.height/2;
+            b.vy = 0;
+            b.landed = true;
+            b.removeAfter = Date.now() + 1000 + Math.random() * 400;
+            score++;
+            scoreDiv.textContent = `Score: ${score}`;
+          }
+        }
+
+        ctx.drawImage(b.image, b.x - b.width/2, b.y - b.height/2, b.width, b.height);
+
+        if (b.removeAfter && now > b.removeAfter) {
+          bananas.splice(i,1);
+          continue;
+        }
+
+        // Oval collision
+        const robotBaseX = robotX;
+        const robotBaseY = robotY + robotHeight/2;
+        const bananaX = b.x;
+        const bananaY = b.y;
+
+        const rx = 150;
+        const ry = 70;
+        const dx = robotBaseX - bananaX;
+        const dy = robotBaseY - bananaY;
+        if ((dx*dx)/(rx*rx) + (dy*dy)/(ry*ry) < 1) {
+          if (!gameOver) {
+            robotRotation = (robotX < b.x ? -90 : 90);
+            robotVX = (robotX < b.x ? -20 : 20);
+            isSlipping = true;
+            setTimeout(() => {
+              gameOver = true;
+              gameOverDiv.style.display = "block";
+              finalScoreDiv.textContent = `Your Score: ${score}`;
+            }, 300);
+          }
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
+
