@@ -232,7 +232,7 @@
           drawGrad(); drawFloatTexts(); frame++; requestAnimationFrame(loop); return;
         }
 
-        let speed = Math.min(2 + grad.hp * 0.1 + frame/600, 5); 
+        let speed = Math.min(grad.hp * 0.03 + frame/600, 2.5); 
         let spawnRate = Math.max(40 - grad.hp * 0.2 - frame/200, 4);
 
         drawGrad(); drawItems();
