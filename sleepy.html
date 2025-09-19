@@ -17,13 +17,12 @@
       margin:20px auto; 
       border:3px solid #444; 
       border-radius:10px; 
+      width:400px;
+      height:500px;
     }
-    #instructions { font-size:16px; margin-top:10px; }
     #score, #lives { font-size:20px; margin-top:5px; }
     #lives { color:red; }
-    #menu {
-      margin-top: 15px;
-    }
+    #menu { margin-top: 15px; }
     button {
       font-family:'Libre Franklin', sans-serif;
       font-size:16px;
@@ -34,18 +33,11 @@
       background:#f8f8f8;
       cursor:pointer;
     }
-    button:hover {
-      background:#e0e0e0;
-    }
+    button:hover { background:#e0e0e0; }
   </style>
 </head>
 <body>
   <h2>Sleepy Grad Student</h2>
-  <div id="instructions">
-    Move with your mouse.<br>
-    Collect 🍕☕ to gain HP. Avoid writing your paper (📄).<br>
-    Reach <b>100 HP</b> to win!
-  </div>
   <canvas id="gameCanvas" width="400" height="500"></canvas>
   <div id="score">HP: 5</div>
   <div id="lives">❤️❤️❤️</div>
@@ -57,6 +49,16 @@
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
+
+    // --- High DPI scaling ---
+    function resizeCanvasForHighDPI(canvas, ctx) {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    resizeCanvasForHighDPI(canvas, ctx);
 
     let grad = { x: 200, y: 450, size: 40, hp: 5, face: "😴", faceTimer: 0 };
     let cursor = { x: 200, y: 480 };
@@ -81,7 +83,6 @@
       document.getElementById("menu").style.display = "none";
     }
 
-    // Mouse movement (only during play)
     canvas.addEventListener("mousemove", e => {
       if (state !== "playing") return;
       const rect = canvas.getBoundingClientRect();
@@ -123,7 +124,7 @@
       let paperChance = (state === "demo") ? 0.4 : Math.min(0.3 + grad.hp * 0.005, 0.7);
       const good = Math.random() > paperChance;
       items.push({
-        x: Math.random() * (canvas.width - 30) + 15,
+        x: Math.random() * (400 - 30) + 15,
         y: -20,
         size: 30,
         good: good,
@@ -131,10 +132,11 @@
       });
     }
 
-    function drawText(text, x, y, size, color="black", align="left") {
+    function drawText(text, x, y, size, color="black", align="center") {
       ctx.font = `${size}px 'Libre Franklin', sans-serif`;
       ctx.fillStyle = color;
       ctx.textAlign = align;
+      ctx.textBaseline = "middle";
       ctx.fillText(text, x, y);
     }
 
@@ -144,20 +146,9 @@
       else if (grad.face !== "😵‍💫") grad.face = "😴";
     }
 
-    function drawCursor() {
-      drawText("🖱️", cursor.x, cursor.y, 24, "center");
-    }
-
-    function drawItems() {
-      items.forEach(it => {
-        drawText(it.emoji, it.x, it.y, it.size, "black", "center");
-      });
-    }
-
-    function updateItems(speed) {
-      items.forEach(it => { it.y += speed; });
-      items = items.filter(it => it.y < canvas.height + 40);
-    }
+    function drawCursor() { drawText("🖱️", cursor.x, cursor.y, 24, "black", "center"); }
+    function drawItems() { items.forEach(it => drawText(it.emoji, it.x, it.y, it.size, "black", "center")); }
+    function updateItems(speed) { items.forEach(it => { it.y += speed; }); items = items.filter(it => it.y < 540); }
 
     function checkCollisions() {
       items.forEach((it, i) => {
@@ -165,27 +156,17 @@
           if (state === "playing") {
             if (it.good) {
               grad.hp++;
-              grad.face = "😳";
-              grad.faceTimer = 20;
+              grad.face = "😳"; grad.faceTimer = 20;
               floatTexts.push({ text: "+1", x: grad.x, y: grad.y, color: "green", life: 30 });
             } else {
-              grad.hp--;
-              lives--;
-              grad.face = "😵‍💫";
-              stunned = 60;
+              grad.hp--; lives--; grad.face = "😵‍💫"; stunned = 60;
               floatTexts.push({ text: "-1", x: grad.x, y: grad.y, color: "red", life: 30 });
               updateLivesDisplay();
               if (lives <= 0) gameOver = true;
             }
           } else {
-            if (it.good) {
-              grad.face = "😳";
-              grad.faceTimer = 20;
-              floatTexts.push({ text: "+1", x: grad.x, y: grad.y, color: "green", life: 30 });
-            } else {
-              grad.face = "😵‍💫";
-              floatTexts.push({ text: "ouch!", x: grad.x, y: grad.y, color: "red", life: 30 });
-            }
+            grad.face = it.good ? "😳" : "😵‍💫";
+            floatTexts.push({ text: it.good ? "+1" : "ouch!", x: grad.x, y: grad.y, color: it.good ? "green" : "red", life: 30 });
           }
           items.splice(i, 1);
         }
@@ -193,125 +174,78 @@
     }
 
     function drawFloatTexts() {
-      floatTexts.forEach(ft => {
-        drawText(ft.text, ft.x, ft.y, 20, ft.color, "center");
-        ft.y -= 1;
-        ft.life--;
-      });
+      floatTexts.forEach(ft => { drawText(ft.text, ft.x, ft.y, 20, ft.color, "center"); ft.y -= 1; ft.life--; });
       floatTexts = floatTexts.filter(ft => ft.life > 0);
     }
 
-    function updateLivesDisplay() {
-      document.getElementById("lives").textContent = "❤️".repeat(lives);
-    }
+    function updateLivesDisplay() { document.getElementById("lives").textContent = "❤️".repeat(lives); }
 
     function loop() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
       if (state === "menu") {
-        drawText("Welcome back!", 200, 200, 24, "black", "center");
-        drawText("Choose Play or Rules Refresh below.", 200, 240, 16, "gray", "center");
-      } else if (state === "intro") {
-        drawText("POV: your deadline is AOE tonight", 200, 140, 18, "black", "center");
-        drawText("but you forgot to eat all day...", 200, 170, 18, "black", "center");
-        drawText("Rules Recap:", 200, 230, 24, "black", "center");
-        drawText("Collect 🍕☕ for HP", 200, 270, 20, "green", "center");
-        drawText("Avoid writing your paper (📄).", 200, 300, 20, "red", "center");
-        drawText("Game starts soon...", 200, 360, 20, "black", "center");
+        drawText("welcome back!", 200, 200, 24, "black");
+        drawText("choose play or rules refresh below.", 200, 240, 16, "gray");
+      } 
+      else if (state === "intro") {
+        let secondsLeft = 5 - Math.floor(stateTimer / 60);
+        drawText("POV: your deadline is AOE tonight", 200, 120, 18, "black");
+        drawText("but you forgot to eat all day...", 200, 150, 18, "black");
+        drawText("collect the 🍕☕", 200, 240, 20, "green");
+        drawText("take a break from ur paper (📄).", 200, 270, 20, "red");
+        drawText("game starts in " + secondsLeft, 200, 340, 20, "black");
 
         stateTimer++;
-        if (stateTimer > 900) { // 15 sec
-          state = "demo";
-          stateTimer = 0;
-          items = [];
-        }
-      } else if (state === "demo") {
+        if (stateTimer > 300) { state = "demo"; stateTimer = 0; items = []; }
+      } 
+      else if (state === "demo") {
         grad.x = 200 + Math.sin(frame / 50) * 120;
         cursor.x = grad.x;
-
         if (frame % 40 === 0) spawnItem();
 
-        updateItems(3);
-        drawGrad();
-        drawCursor();
-        drawItems();
-        checkCollisions();
-        drawFloatTexts();
-        drawText("Demo... watch the cursor!", 200, 100, 20, "blue", "center");
+        updateItems(3); drawGrad(); drawCursor(); drawItems(); checkCollisions(); drawFloatTexts();
+
+        let secondsLeft = 8 - Math.floor(stateTimer / 60);
+        drawText("Demo... watch the cursor!", 200, 80, 20, "blue");
+        drawText("next in " + secondsLeft, 200, 110, 18, "gray");
 
         stateTimer++;
-        if (stateTimer > 900) { // 15 sec demo
-          state = "countdown";
-          stateTimer = 180; // 3 sec countdown
-        }
-      } else if (state === "countdown") {
+        if (stateTimer > 480) { state = "countdown"; stateTimer = 180; }
+      } 
+      else if (state === "countdown") {
         let secondsLeft = Math.ceil(stateTimer / 60);
-        drawText("Ready to play?", 200, 200, 24, "black", "center");
-        drawText(secondsLeft, 200, 260, 40, "red", "center");
+        drawText("Ready to play?", 200, 200, 24, "black");
+        drawText(secondsLeft, 200, 260, 40, "red");
         stateTimer--;
-        if (stateTimer <= 0) {
-          state = "playing";
-          document.getElementById("menu").style.display = "block";
-        }
-      } else if (state === "playing") {
+        if (stateTimer <= 0) { state = "playing"; document.getElementById("menu").style.display = "block"; }
+      } 
+      else if (state === "playing") {
         if (gameOver || gameWon) {
           if (!showMessage && gameOver) {
-            // flood stage (2 sec = 120 frames)
             if (floodTimer < 120) {
-              for (let i=0;i<10;i++){
-                items.push({
-                  x: Math.random()*canvas.width,
-                  y: -20,
-                  size: 30+Math.random()*10,
-                  good:false,
-                  emoji:"📄"
-                });
-              }
-              updateItems(8);
-              drawItems();
-              drawGrad();
-              drawFloatTexts();
-              floodTimer++;
-              frame++;
-              requestAnimationFrame(loop);
-              return;
-            } else {
-              items = [];
-              showMessage = true;
-            }
+              for (let i=0;i<10;i++) items.push({ x: Math.random()*400, y: -20, size: 30+Math.random()*10, good:false, emoji:"📄" });
+              updateItems(8); drawItems(); drawGrad(); drawFloatTexts(); floodTimer++; frame++; requestAnimationFrame(loop); return;
+            } else { items = []; showMessage = true; }
           }
-          // show final message
           ctx.clearRect(0,0,canvas.width,canvas.height);
-          drawText("break's over back to the grind📄💀", canvas.width/2, canvas.height/2, 18, "red", "center");
-          drawGrad();
-          drawFloatTexts();
-          frame++;
-          requestAnimationFrame(loop);
-          return;
+          drawText("break's over back to the grind📄💀", 200, 250, 18, "red");
+          drawGrad(); drawFloatTexts(); frame++; requestAnimationFrame(loop); return;
         }
 
-        let speed = Math.min(2 + grad.hp * 0.12, 12);
-        let spawnRate = Math.max(40 - grad.hp * 0.6, 5);
+        let speed = Math.min(3 + grad.hp * 0.5 + frame/600, 18); 
+        let spawnRate = Math.max(30 - grad.hp * 0.5 - frame/200, 8);
 
-        drawGrad();
-        drawItems();
-        if (stunned > 0) stunned--;
-        else {
-          updateItems(speed);
-          checkCollisions();
-        }
-        drawFloatTexts();
-        document.getElementById("score").textContent = "HP: " + grad.hp;
+        drawGrad(); drawItems();
+        if (stunned > 0) stunned--; else { updateItems(speed); checkCollisions(); }
+        drawFloatTexts(); document.getElementById("score").textContent = "HP: " + grad.hp;
         if (grad.hp >= 100) gameWon = true;
         if (frame % Math.floor(spawnRate) === 0) spawnItem();
       }
 
-      frame++;
-      requestAnimationFrame(loop);
+      frame++; requestAnimationFrame(loop);
     }
 
-    updateLivesDisplay();
-    loop();
+    updateLivesDisplay(); loop();
   </script>
 </body>
 </html>
